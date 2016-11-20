@@ -1,0 +1,40 @@
+---
+engines:
+  csslint:
+    enabled: true
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - ruby
+      - javascript
+      - python
+      - php
+  eslint:
+    enabled: true
+  fixme:
+    enabled: true
+  phpcodesniffer:
+    enabled: true
+    config:
+      standard: "phpcs.xml"
+      ignore_warnings: true
+      encoding: utf-8
+  phpmd:
+    enabled: true
+    config:
+      rulesets: "phpmd.xml"
+ratings:
+  paths:
+  - "**.css"
+  - "**.inc"
+  - "**.js"
+  - "**.jsx"
+  - "**.module"
+  - "**.php"
+  - "**.py"
+  - "**.rb"
+exclude_paths:
+- "gulpfile.js"
+- "vendor/*"
+- "node_modules/*"

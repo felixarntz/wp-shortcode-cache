@@ -1,0 +1,35 @@
+{
+  "name": "wp-shortcode-cache",
+  "version": "1.0.0",
+  "description": "Adds a customizable cache layer to all shortcodes in WordPress.",
+  "keywords": [
+    "wordpress",
+    "plugin",
+    "shortcode",
+    "cache",
+    "performance"
+  ],
+  "author": {
+    "name": "Felix Arntz",
+    "email": "felix-arntz@leaves-and-love.net",
+    "url": "https://leaves-and-love.net"
+  },
+  "homepage": "https://wordpress.org/plugins/wp-shortcode-cache/",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/felixarntz/wp-shortcode-cache.git"
+  },
+  "bugs": {
+    "url" : "https://github.com/felixarntz/wp-shortcode-cache/issues"
+  },
+  "license": "GPL-3.0",
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-install": "^0.6.0",
+    "gulp-load-plugins": "^1.2.0",
+    "gulp-replace": "^0.5.4"
+  }
+}
