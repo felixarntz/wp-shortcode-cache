@@ -85,7 +85,9 @@ class WP_Shortcode_Cache {
 		$cache_data = $this->retrieve_cache_data( $tag, $attr, $matches );
 		$cache_key = $this->get_cache_key( $tag, $cache_data );
 
-		$this->set_cached_output( $cache_key, $output );
+		$cache_duration = $this->get_cache_duration( $tag );
+
+		$this->set_cached_output( $cache_key, $output, $cache_duration );
 
 		return $output;
 	}
@@ -111,8 +113,10 @@ class WP_Shortcode_Cache {
 	 *
 	 * @param string $cache_key Cache key.
 	 * @param mixed  $value     Value to cache under that key.
+	 * @param int    $expire    Optional. When the cache data should expire, in seconds.
+	 *                          Default 0 (no expiration).
 	 */
-	public function set_cached_output( $cache_key, $value ) {
+	public function set_cached_output( $cache_key, $value, $expire = 0 ) {
 		wp_cache_set( $cache_key, $value, self::CACHE_GROUP );
 	}
 
@@ -158,6 +162,23 @@ class WP_Shortcode_Cache {
 		//TODO
 
 		return $attr;
+	}
+
+	/**
+	 * Retrieves the cache duration a given shortcode should be cached.
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 *
+	 * @param string $tag Shortcode name.
+	 * @return int The cache duration in seconds, or 0 for no expiration.
+	 */
+	private function get_cache_duration( $tag ) {
+		$duration = 0;
+
+		//TODO
+
+		return $duration;
 	}
 
 	/**
