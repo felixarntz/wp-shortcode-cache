@@ -32,10 +32,6 @@ The plugin will work properly out of the box for all shortcodes that entirely re
 1. Upload the entire `wp-shortcode-cache` folder to the `/wp-content/plugins/` directory or download it through the WordPress backend.
 2. Activate the plugin through the 'Plugins' menu in WordPress.
 
-== Frequently Asked Questions ==
-
-TODO
-
 = Where should I submit my support request? =
 
 I preferably take support requests as [issues on GitHub](https://github.com/felixarntz/wp-shortcode-cache/issues), so I would appreciate if you created an issue for your request there. However, if you don't have an account there and do not want to sign up, you can of course use the [wordpress.org support forums](https://wordpress.org/support/plugin/wp-shortcode-cache) as well.
