@@ -6,6 +6,8 @@
  * @since 1.0.0
  */
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Returns the main instance of the WP_Shortcode_Cache class.
  *
@@ -28,7 +30,7 @@ function wp_shortcode_cache() {
  * @param array  $external_data Array of $identifier => $params pairs. Each $params
  *                              element can either be a string used as `name`, or for
  *                              more complex use-cases an array containing a `name` key,
- *                              and optionally a `type` key.
+ *                              and optionally `type` and `args` keys.
  * @return bool|WP_Error True on success, error object on failure.
  */
 function wp_shortcode_cache_register_external_data_values( $tag, $external_data ) {
@@ -50,10 +52,11 @@ function wp_shortcode_cache_register_external_data_values( $tag, $external_data 
  * @param string|callable $data_name       Name of global key, or callback function if $type is 'callback'.
  * @param string          $data_type       Optional. Either 'callback', 'global', 'request', 'get', 'post'
  *                                         or 'session'. Default 'global'.
+ * @param array           $data_args       Optional. Additional arguments passed to a callback. Default empty.
  * @return bool|WP_Error True on success, error object on failure.
  */
-function wp_shortcode_cache_register_external_data_value( $tag, $data_identifier, $data_name, $data_type = 'global' ) {
-	return wp_shortcode_cache()->register_external_data_value( $tag, $data_identifier, $data_name, $data_type );
+function wp_shortcode_cache_register_external_data_value( $tag, $data_identifier, $data_name, $data_type = 'global', $data_args = array() ) {
+	return wp_shortcode_cache()->register_external_data_value( $tag, $data_identifier, $data_name, $data_type, $data_args );
 }
 
 /**

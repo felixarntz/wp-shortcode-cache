@@ -83,7 +83,7 @@ class WP_Shortcode_Cache_Tag {
 	 * @param array $external_data Array of $identifier => $params pairs. Each $params
 	 *                             element can either be a string used as `name`, or for
 	 *                             more complex use-cases an array containing a `name` key,
-	 *                             and optionally a `type` key.
+	 *                             and optionally `type` and `args` keys.
 	 * @return bool|WP_Error True on success, error object on failure.
 	 */
 	public function register_external_data_values( $external_data ) {
@@ -99,7 +99,7 @@ class WP_Shortcode_Cache_Tag {
 				/* translators: %s: shortcode name */
 				$error->add( 'missing_external_data_value_name', __( 'The name argument is missing for external cache data registered for shortcode %s.', 'wp-shortcode-cache' ), esc_attr( $this->tag ) );
 			} else {
-				$result = register_external_data_value( $identifier, $params['name'], isset( $params['type'] ) ? $params['type'] : 'global' );
+				$result = register_external_data_value( $identifier, $params['name'], isset( $params['type'] ) ? $params['type'] : 'global', isset( $params['args'] ) ? $params['args'] : array() );
 				if ( is_wp_error( $result ) ) {
 					$error->add( $result->get_error_code(), $result->get_error_message() );
 				}
@@ -126,13 +126,15 @@ class WP_Shortcode_Cache_Tag {
 	 * @param string|callable $name       Name of global key, or callback function if $type is 'callback'.
 	 * @param string          $type       Optional. Either 'callback', 'global', 'request', 'get', 'post'
 	 *                                    or 'session'. Default 'global'.
+	 * @param array           $args       Optional. Additional arguments passed to a callback. Default empty.
 	 * @return bool|WP_Error True on success, error object on failure.
 	 */
-	public function register_external_data_value( $identifier, $name, $type = 'global' ) {
+	public function register_external_data_value( $identifier, $name, $type = 'global', $args = array() ) {
 		switch ( $type ) {
 			case 'callback':
 				$this->callbacks[ $identifier ] = array(
 					'name'         => $name,
+					'args'         => $args,
 				);
 				return true;
 			case 'global':
@@ -222,11 +224,11 @@ class WP_Shortcode_Cache_Tag {
 			}
 
 			/* Special case for get_post() function. */
-			if ( 'get_post' === $params['name'] ) {
+			if ( 'get_post' === $params['name'] && empty( $params['args'] ) ) {
 				$attr = $this->fill_current_post( $attr, $identifier );
 			} else {
 				if ( is_callable( $params['name'] ) ) {
-					$attr[ $identifier ] = call_user_func( $params['name'] );
+					$attr[ $identifier ] = call_user_func_array( $params['name'], $params['args'] );
 				}
 			}
 		}
