@@ -20,10 +20,6 @@ Tags:        shortcode, cache, performance
 
 defined( 'ABSPATH' ) || exit;
 
-if ( function_exists( 'wp_shortcode_cache_init' ) ) {
-	return;
-}
-
 /**
  * Initializes the plugin.
  *
