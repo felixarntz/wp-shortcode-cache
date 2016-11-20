@@ -4,7 +4,7 @@
 [![Latest Stable Version](https://poser.pugx.org/felixarntz/wp-shortcode-cache/version)](https://packagist.org/packages/felixarntz/wp-shortcode-cache)
 [![License](https://poser.pugx.org/felixarntz/wp-shortcode-cache/license)](https://packagist.org/packages/felixarntz/wp-shortcode-cache)
 
-# WP Plugin Control
+# WP Shortcode Cache
 
 Adds a customizable cache layer to all shortcodes in WordPress.
 
