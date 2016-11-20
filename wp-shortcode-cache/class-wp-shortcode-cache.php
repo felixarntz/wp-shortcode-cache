@@ -39,19 +39,19 @@ class WP_Shortcode_Cache {
 	 * @since 1.0.0
 	 * @access public
 	 *
-	 * @param bool|string $output Return value of the short-circuit. Will be set to
-	 *                            false unless another filter has already modified it.
-	 * @param string      $tag    Shortcode name.
-	 * @param array       $attr   Shortcode attributes array.
-	 * @param array       $m      Regular expression match array.
+	 * @param bool|string $output  Return value of the short-circuit. Will be set to
+	 *                             false unless another filter has already modified it.
+	 * @param string      $tag     Shortcode name.
+	 * @param array       $attr    Shortcode attributes array.
+	 * @param array       $matches Regular expression match array.
 	 * @return bool|string The cached output if found, or the original input value.
 	 */
-	public function maybe_return_cached_output( $output, $tag, $attr, $m ) {
+	public function maybe_return_cached_output( $output, $tag, $attr, $matches ) {
 		if ( ! $this->use_cache( $tag, $output, true ) ) {
 			return $output;
 		}
 
-		$cache_data = $this->retrieve_cache_data( $tag, $attr, $m );
+		$cache_data = $this->retrieve_cache_data( $tag, $attr, $matches );
 		$cache_key = $this->get_cache_key( $tag, $cache_data );
 
 		$cached_output = $this->get_cached_output( $cache_key );
@@ -71,18 +71,18 @@ class WP_Shortcode_Cache {
 	 * @since 1.0.0
 	 * @access public
 	 *
-	 * @param string $output Shortcode output.
-	 * @param string $tag    Shortcode name.
-	 * @param array  $attr   Shortcode attributes array.
-	 * @param array  $m      Regular expression match array.
+	 * @param string $output  Shortcode output.
+	 * @param string $tag     Shortcode name.
+	 * @param array  $attr    Shortcode attributes array.
+	 * @param array  $matches Regular expression match array.
 	 * @return string Original shortcode output, passed through.
 	 */
-	public function maybe_cache_output( $output, $tag, $attr, $m ) {
+	public function maybe_cache_output( $output, $tag, $attr, $matches ) {
 		if ( ! $this->use_cache( $tag, $output, false ) ) {
 			return $output;
 		}
 
-		$cache_data = $this->retrieve_cache_data( $tag, $attr, $m );
+		$cache_data = $this->retrieve_cache_data( $tag, $attr, $matches );
 		$cache_key = $this->get_cache_key( $tag, $cache_data );
 
 		$this->set_cached_output( $cache_key, $output );
@@ -147,13 +147,13 @@ class WP_Shortcode_Cache {
 	 *
 	 * @see WP_Shortcode_Cache::get_cache_key()
 	 *
-	 * @param string $tag  Shortcode name.
-	 * @param array  $attr Shortcode attributes array.
-	 * @param array  $m    Regular expression match array.
+	 * @param string $tag     Shortcode name.
+	 * @param array  $attr    Shortcode attributes array.
+	 * @param array  $matches Regular expression match array.
 	 * @return array Array of all relevant shortcode data.
 	 */
-	private function retrieve_cache_data( $tag, $attr, $m ) {
-		$attr['__content'] = isset( $m[5] ) ? $m[5] : null;
+	private function retrieve_cache_data( $tag, $attr, $matches ) {
+		$attr['__content'] = isset( $matches[5] ) ? $matches[5] : null;
 
 		//TODO
 
