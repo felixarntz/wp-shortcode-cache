@@ -35,10 +35,13 @@ function wp_shortcode_cache_init() {
 	require_once $plugin_path . 'wp-shortcode-cache/class-wp-shortcode-cache-tag.php';
 	require_once $plugin_path . 'wp-shortcode-cache/class-wp-shortcode-cache.php';
 	require_once $plugin_path . 'wp-shortcode-cache/functions.php';
+	require_once $plugin_path . 'wp-shortcode-cache/default-support.php';
 
 	$shortcode_cache = wp_shortcode_cache();
 	add_filter( 'pre_do_shortcode_tag', array( $shortcode_cache, 'maybe_return_cached_output' ), 100, 4 );
 	add_filter( 'do_shortcode_tag',     array( $shortcode_cache, 'maybe_cache_output' ),         1,   4 );
+
+	add_action( 'init', 'wp_shortcode_cache_register_support' );
 }
 
 /**
