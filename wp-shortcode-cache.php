@@ -32,6 +32,7 @@ function wp_shortcode_cache_init() {
 
 	$plugin_path = plugin_dir_path( __FILE__ );
 
+	require_once $plugin_path . 'wp-shortcode-cache/class-wp-shortcode-cache-tag.php';
 	require_once $plugin_path . 'wp-shortcode-cache/class-wp-shortcode-cache.php';
 	require_once $plugin_path . 'wp-shortcode-cache/functions.php';
 

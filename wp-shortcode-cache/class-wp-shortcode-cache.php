@@ -20,6 +20,15 @@ class WP_Shortcode_Cache {
 	const CACHE_GROUP = 'shortcodes';
 
 	/**
+	 * Registered shortcode cache tags.
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 * @var array
+	 */
+	private $tags = array();
+
+	/**
 	 * The main instance of the class.
 	 *
 	 * @since 1.0.0
@@ -29,6 +38,96 @@ class WP_Shortcode_Cache {
 	 * @var WP_Shortcode_Cache|null
 	 */
 	private static $instance = null;
+
+	/**
+	 * Registers multiple external data values for a given shortcode.
+	 *
+	 * @since 1.0.0
+	 * @access public
+	 *
+	 * @see WP_Shortcode_Cache_Tag::register_external_data_values()
+	 *
+	 * @param string $tag           Shortcode name.
+	 * @param array  $external_data Array of $identifier => $params pairs. Each $params
+	 *                              element can either be a string used as `name`, or for
+	 *                              more complex use-cases an array containing a `name` key,
+	 *                              and optionally a `type` key.
+	 * @return bool|WP_Error True on success, error object on failure.
+	 */
+	public function register_external_data_values( $tag, $external_data ) {
+		if ( ! isset( $this->tags[ $tag ] ) ) {
+			$this->tags[ $tag ] = new WP_Shortcode_Cache_Tag( $tag );
+		}
+
+		return $this->tags[ $tag ]->register_external_data_values( $external_data );
+	}
+
+	/**
+	 * Registers an external data value for a given shortcode.
+	 *
+	 * @since 1.0.0
+	 * @access public
+	 *
+	 * @see WP_Shortcode_Cache_Tag::register_external_data_value()
+	 *
+	 * @param string          $tag             Shortcode name.
+	 * @param string          $data_identifier Unique identifier for this external data value. This value is
+	 *                                         used as array key for external data. The name of an existing
+	 *                                         shortcode attribute may be passed so that this value acts as
+	 *                                         a fallback.
+	 * @param string|callable $data_name       Name of global key, or callback function if $type is 'callback'.
+	 * @param string          $data_type       Optional. Either 'callback', 'global', 'request', 'get', 'post'
+	 *                                         or 'session'. Default 'global'.
+	 * @return bool|WP_Error True on success, error object on failure.
+	 */
+	public function register_external_data_value( $tag, $data_identifier, $data_name, $data_type = 'global' ) {
+		if ( ! isset( $this->tags[ $tag ] ) ) {
+			$this->tags[ $tag ] = new WP_Shortcode_Cache_Tag( $tag );
+		}
+
+		return $this->tags[ $tag ]->register_external_data_value( $data_identifier, $data_name, $data_type );
+	}
+
+	/**
+	 * Unregisters an external data value for a given shortcode.
+	 *
+	 * @since 1.0.0
+	 * @access public
+	 *
+	 * @see WP_Shortcode_Cache_Tag::unregister_external_data_value()
+	 *
+	 * @param string $tag             Shortcode name.
+	 * @param string $data_identifier Unique identifier of the external data value to unregister.
+	 * @return bool|WP_Error True on success, error object on failure.
+	 */
+	public function unregister_external_data_value( $tag, $data_identifier ) {
+		if ( ! isset( $this->tags[ $tag ] ) ) {
+			/* translators: %s: shortcode name */
+			return new WP_Error( 'no_external_data', sprintf( __( 'No external cache data is registered for shortcode %s.', 'wp-shortcode-tag' ), esc_attr( $tag ) ) );
+		}
+
+		return $this->tags[ $tag ]->unregister_external_data_value( $data_identifier );
+	}
+
+	/**
+	 * Sets the duration for which a given shortcode should be cached.
+	 *
+	 * @since 1.0.0
+	 * @access public
+	 *
+	 * @see WP_Shortcode_Cache_Tag::set_cache_duration()
+	 *
+	 * @param string $tag      Shortcode name.
+	 * @param int    $duration Cache duration in seconds. Set to 0 for no expiration.
+	 * @return bool|WP_Error True on success, error object on failure.
+	 */
+	public function set_cache_duration( $tag, $duration ) {
+		if ( ! isset( $this->tags[ $tag ] ) ) {
+			$this->tags[ $tag ] = new WP_Shortcode_Cache_Tag( $tag );
+		}
+
+		return $this->tags[ $tag ]->set_cache_duration( $duration );
+	}
 
 	/**
 	 * Tries to fetch cached output for the passed shortcode and its data.
@@ -157,9 +256,22 @@ class WP_Shortcode_Cache {
 	 * @return array Array of all relevant shortcode data.
 	 */
 	private function retrieve_cache_data( $tag, $attr, $matches ) {
-		$attr['__content'] = isset( $matches[5] ) ? $matches[5] : null;
+		if ( isset( $this->tags[ $tag ] ) ) {
+			$attr = $this->tags[ $tag ]->fill_external_data( $attr );
+		} else {
+			/* By default, always include global $post and the current user. */
+			$post = get_post();
+			if ( $post ) {
+				$attr['__post_id'] = $post->ID;
+				$attr['__post_last_changed'] = $post->post_modified_gmt;
+			}
+			$user_id = get_current_user_id();
+			if ( $user_id > 0 ) {
+				$attr['__user_id'] = $user_id;
+			}
+		}
 
-		//TODO
+		$attr['__content'] = isset( $matches[5] ) ? $matches[5] : null;
 
 		return $attr;
 	}
@@ -171,14 +283,20 @@ class WP_Shortcode_Cache {
 	 * @access private
 	 *
 	 * @param string $tag Shortcode name.
-	 * @return int The cache duration in seconds, or 0 for no expiration.
+	 * @return int Cache duration in seconds, or 0 for no expiration.
 	 */
 	private function get_cache_duration( $tag ) {
-		$duration = 0;
+		if ( isset( $this->tags[ $tag ] ) ) {
+			return $this->tags[ $tag ]->get_cache_duration();
+		}
 
-		//TODO
+		/* By default, always cache for an hour for the current user. */
+		$user_id = get_current_user_id();
+		if ( $user_id > 0 ) {
+			return HOUR_IN_SECONDS;
+		}
 
-		return $duration;
+		return 0;
 	}
 
 	/**
