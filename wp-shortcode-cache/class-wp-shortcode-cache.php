@@ -104,7 +104,7 @@ class WP_Shortcode_Cache {
 	public function unregister_external_data_value( $tag, $data_identifier ) {
 		if ( ! isset( $this->tags[ $tag ] ) ) {
 			/* translators: %s: shortcode name */
-			return new WP_Error( 'no_external_data', sprintf( __( 'No external cache data is registered for shortcode %s.', 'wp-shortcode-tag' ), esc_attr( $tag ) ) );
+			return new WP_Error( 'no_external_data', sprintf( __( 'No external cache data is registered for shortcode %s.', 'wp-shortcode-cache' ), esc_attr( $tag ) ) );
 		}
 
 		return $this->tags[ $tag ]->unregister_external_data_value( $data_identifier );
@@ -157,6 +157,16 @@ class WP_Shortcode_Cache {
 		$cached_output = $this->get_cached_output( $cache_key );
 		if ( false === $cached_output ) {
 			return $output;
+		}
+
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			/* translators: 1: shortcode name, 2: shortcode cache key */
+			$before_output = '<!-- ' . sprintf( __( 'Start of cached shortcode %1$s (stored with key %2$s)', 'wp-shortcode-cache' ), esc_attr( $tag ), $cache_key ) . ' -->';
+
+			/* translators: %s: shortcode name */
+			$after_output = '<!-- ' . sprintf( __( 'End of cached shortcode %s', 'wp-shortcode-cache' ), esc_attr( $tag ) ) . ' -->';
+
+			$cached_output = $before_output . $cached_output . $after_output;
 		}
 
 		return $cached_output;
@@ -317,7 +327,7 @@ class WP_Shortcode_Cache {
 	 * @return bool True if the cache should be used, false otherwise.
 	 */
 	private function use_cache( $tag, $output = false, $pre = false ) {
-		$use_cache = ! $pre || false === $output;
+		$use_cache = ! is_admin() && ( ! $pre || false === $output );
 
 		/**
 		 * Filters whether the cache should be used for the given shortcode.

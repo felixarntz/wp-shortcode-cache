@@ -173,7 +173,7 @@ class WP_Shortcode_Cache_Tag {
 			return true;
 		}
 
-		return new WP_Error( 'invalid_external_data_value_identifier', sprintf( __( 'No external cache data value with identifier %1$s is registered for shortcode %2$s.', 'wp-shortcode-tag' ), esc_attr( $identifier ), esc_attr( $this->tag ) ) );
+		return new WP_Error( 'invalid_external_data_value_identifier', sprintf( __( 'No external cache data value with identifier %1$s is registered for shortcode %2$s.', 'wp-shortcode-cache' ), esc_attr( $identifier ), esc_attr( $this->tag ) ) );
 	}
 
 	/**
